@@ -1,0 +1,50 @@
+{
+  // ----------------------------------------------------------------
+  //  MT5 Group Series Login Allocator - configuration
+  //
+  //  Deploy this file NEXT TO the plugin DLL, renamed to:
+  //      SeriesPlugin.config.json   (for SeriesPlugin.dll  / x86)
+  //      SeriesPlugin.config.json   (for SeriesPlugin64.dll / x64)
+  //  The plugin looks for "<dll-folder>\SeriesPlugin.config.json".
+  //
+  //  Comments (// and /* */) and trailing commas are allowed.
+  //  Group names use the MT5 path with a single backslash in real
+  //  life; in JSON each backslash MUST be written as "\\".
+  // ----------------------------------------------------------------
+
+  // Write an INFO line to the server journal for every allocation.
+  "log_allocations": true,
+
+  // If a new account's group matches NO rule below:
+  //   false -> let MT5 assign its normal/default login (safe default)
+  //   true  -> reject the account creation with "not found"
+  "reject_unconfigured_groups": false,
+
+  // If the creation request already carries a non-zero login:
+  //   false -> keep the caller's login, do not allocate (safe default)
+  //   true  -> ignore it and allocate from the series anyway
+  "override_explicit_login": false,
+
+  // Before assigning a candidate login, verify it is not already taken
+  // (covers pre-existing or manually-numbered accounts). Recommended.
+  "check_existing_logins": true,
+
+  // Optional best-effort mirror of allocations into a SQL table.
+  // The JSON state file is always the source of truth; SQL is for
+  // reporting/audit and never blocks or fails account creation.
+  "sql_mirror": {
+    "enabled": false,
+    "odbc_connection_string": "Driver={ODBC Driver 17 for SQL Server};Server=localhost;Database=mt5;Trusted_Connection=yes;",
+    "table": "group_account_series"
+  },
+
+  // The per-group series. "start_login" is the first login handed out.
+  // "max_login" = 0 means unlimited. A trailing '*' makes the group a
+  // prefix match (e.g. "real\\vip*" matches "real\\vip", "real\\vip2").
+  // When a group matches several rules, the longest (most specific) wins.
+  "groups": [
+    { "group": "real\\group_a", "start_login": 786000,  "max_login": 786999 },
+    { "group": "real\\group_b", "start_login": 900000,  "max_login": 0 },
+    { "group": "demo\\vip",     "start_login": 5000000, "max_login": 0 }
+  ]
+}
